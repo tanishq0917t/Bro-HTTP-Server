@@ -260,14 +260,14 @@ int main()
             <html>
             <head>
             <meta charset='UTF-8'>
-            <title>Whatever</title>
+            <title>Our Customers</title>
             </head>
             <body>
             <h1>List of Customers</h1>
             <ul>
-            <li>Ramesh</li>
-            <li>Suresh</li>
-            <li>Jitesh</li>
+            <li>Microsoft</li>
+            <li>Tata</li>
+            <li>Wipro</li>
             </ul>
             <a href='/'>Home</a>
             </body>
