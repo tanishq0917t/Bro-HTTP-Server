@@ -4,4 +4,4 @@ Bro is capable of serving dynamic and static pages.\
 Some key features(implemented till now) are-:\
     1. Request Mappings\
     2. Request Forwarding\
-    3. Session availability\
+    3. Session availability
