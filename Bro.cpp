@@ -83,11 +83,17 @@ class Response
             return *this;
         }
 };
+enum __request_method__{__GET__,__POST__,__PUT__,__DELETE__,__CONNECT__,__TRACE__,__HEAD__,__OPTIONS__};
+typedef struct __url__mappings
+{
+    __request_method__ requestMethod;
+    void (*mappedFunction)(Request &,Response &);
+}URLMapping;
 class Bro
 {
     private:
         string staticResourcesFolder;
-        map<string,void (*)(Request &,Response &)> urlMappings;
+        map<string,URLMapping> urlMappings;
     public:
         Bro()
         {
@@ -112,8 +118,7 @@ class Bro
         {
             if(Validator::isValidURLFormat(url))
             {
-                urlMappings.insert({url,callBack});
-            }
+                urlMappings.insert({url,{__GET__,callBack}});            }
         }
         void listen(int portNumber,void (*callBack)(Error &))
         {
@@ -176,55 +181,15 @@ class Bro
             while(1)
             {
                 clientSocketDescriptor=accept(serverSocketDescriptor,(struct sockaddr *)&clientSocketInformation,&len);
-                if(clientSocketDescriptor<0)
+                requestLen=recv(clientSocketDescriptor,requestBuffer,sizeof(requestBuffer)-sizeof(char),0);
+                if(requestLen==0 || requestLen==-1)
                 {
-                    //not decided yet
+                    close(clientSocketDescriptor);
+                    continue;
                 }
-                forward_list<string> requestBufferDS;
-                forward_list<string> :: iterator requestBufferDSIterator;
-                requestBufferDSIterator=requestBufferDS.before_begin();
-                int requestBufferDSSize=0;
-                int requestDataCount=0;
-                while(1)
-                {
-                    requestLen=recv(clientSocketDescriptor,requestBuffer,sizeof(requestBuffer)-sizeof(char),0);
-                    if(requestLen==0) break;
-                    requestBuffer[requestLen]='\0';
-                    requestBufferDSIterator=requestBufferDS.insert_after(requestBufferDSIterator,string(requestBuffer));
-                    requestBufferDSSize++;
-                    requestDataCount+=requestLen;
-                }
-                if(requestBufferDSSize>0)
-                {
-                    char *requestData=new char[requestDataCount+1];
-                    char *p;
-                    p=requestData;
-                    const char *q;
-                    requestBufferDSIterator=requestBufferDS.begin();
-                    while(requestBufferDSIterator!=requestBufferDS.end())
-                    {
-                        q=(*requestBufferDSIterator).c_str();
-                        while(*q)
-                        {
-                            *p=*q;
-                            p++;
-                            q++;
-                        }
-                        ++requestBufferDSIterator;
-                    }
-                    *p='\0';
-                    requestBufferDS.clear();
-                    printf("------------------Request Data Begins---------------\n");
-                    printf("%s\n",requestData);
-                    printf("-------------------Request Data Ends----------------\n");
-                    delete [] requestData;
-                }
-                else
-                {
-                    //something if no data was received
-                }
+                requestBuffer[requestLen]='\0';
                 close(clientSocketDescriptor);
-            }
+            } //Infinite loop ends here for accepting requests
             #ifdef _WIN32
                 WSACleanup();
             #endif
@@ -260,14 +225,14 @@ int main()
             <html>
             <head>
             <meta charset='UTF-8'>
-            <title>Our Customers</title>
+            <title>Whatever</title>
             </head>
             <body>
             <h1>List of Customers</h1>
             <ul>
-            <li>Microsoft</li>
-            <li>Tata</li>
-            <li>Wipro</li>
+            <li>Ramesh</li>
+            <li>Suresh</li>
+            <li>Jitesh</li>
             </ul>
             <a href='/'>Home</a>
             </body>
